@@ -1,0 +1,1 @@
+<template><div></div></template><script>export default{props:["render","value"],data(){return {};},components:{}}</script>

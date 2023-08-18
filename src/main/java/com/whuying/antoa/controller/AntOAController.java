@@ -43,11 +43,7 @@ public abstract class AntOAController {
 	public void init() throws HttpException {
 		this.auth = new AuthService();
 		this.gridObj = new Grid();
-		try {
-			this.getUserInfo();
-		} catch (Exception e) {
-			throw new HttpException(e.getMessage(), 403);
-		}
+		this.getUserInfo();
 		this.grid(this.gridObj);
 	}
 
@@ -70,6 +66,7 @@ public abstract class AntOAController {
 	public abstract String statistic();
 	
 	protected String error(Exception e) {
+		e.printStackTrace();
 		return new ErrorResponse(0, e.getMessage(), null).toString();
 	}
 
@@ -108,7 +105,7 @@ public abstract class AntOAController {
 		Map<String, Object> user = DB.table("antoa_user").where("id", uid).first();
 		if (user == null)
 			throw new HttpException("登录失效", 403);
-		if ((boolean) (user.get("status")) == false)
+		if ((int)(user.get("status")) == 0)
 			throw new HttpException("账户已被封禁", 403);
 		if (!this.checkPower(uid))
 			throw new HttpException("权限不足", 403);
@@ -349,9 +346,8 @@ public abstract class AntOAController {
 		if (!this.gridObj.getGridList().hasDelete)
 			throw new Exception("非法操作");
 		this.getUserInfo();
-		JSONObject req = JSONObject.parseObject(readJSONFromRequest(request()));
 		DBListOperator obj = this.gridObj.getGridList().getDBObject();
-		String id = req.getString("id");
+		String id = request().getParameter("id");
 		if (id == null)
 			throw new Exception("缺少参数ID");
 		Map<String, Object> resp = obj.find(Integer.parseInt(id));
@@ -589,7 +585,7 @@ public abstract class AntOAController {
 		}
 	}
 
-	@RequestMapping(value = { "/delete" }, method = RequestMethod.POST)
+	@RequestMapping(value = { "/delete" }, method = RequestMethod.GET)
 	public String apiDeleteResponse() throws Exception {
 		try {
 			return apiDelete().toString();

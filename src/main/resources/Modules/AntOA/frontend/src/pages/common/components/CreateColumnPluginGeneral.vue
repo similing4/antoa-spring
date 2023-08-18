@@ -1,0 +1,1 @@
+<template><div></div></template><script>export default{props:["column","gridApiObject","value"],data(){return {};},components:{}}</script>

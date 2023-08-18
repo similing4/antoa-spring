@@ -1,5 +1,6 @@
 package com.whuying.antoa.db;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -69,7 +70,19 @@ public class DB {
 	}
 
 	public static List<Map<String, Object>> executeSelect(JdbcTemplate database, String sql, Object[] params) {
-		return database.queryForList(sql, params);
+		List<Map<String, Object>> arr = database.queryForList(sql, params);
+		for(Map<String, Object> row : arr)
+			convertRow(row);
+		return arr;
+	}
+	
+	private static void convertRow(Map<String, Object> row){
+		for(String key : row.keySet()) {
+			if(row.get(key) instanceof java.sql.Timestamp)
+				row.put(key, new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format((java.sql.Timestamp)row.get(key)));
+			if(row.get(key) instanceof Boolean)
+				row.put(key, ((Boolean)row.get(key)) ? 1 : 0);
+		}
 	}
 
 	public DB where(String wh) {
@@ -291,7 +304,10 @@ public class DB {
 		SelectJoinStep<Record> db = generateSelectStep();
 		System.out.println("SQL select execute: " + db.getSQL() + System.lineSeparator() + "SQL select bind values: "
 				+ arrayJoin(db.getBindValues().toArray()));
-		return database.queryForList(db.getSQL(), db.getBindValues().toArray());
+		List<Map<String, Object>> arr = database.queryForList(db.getSQL(), db.getBindValues().toArray());
+		for(Map<String, Object> row : arr)
+			convertRow(row);
+		return arr;
 	}
 
 	public Map<String, Object> first() {
@@ -302,6 +318,8 @@ public class DB {
 		List<Map<String, Object>> arr = database.queryForList(db.getSQL(), db.getBindValues().toArray());
 		if (arr.size() == 0)
 			return null;
+		for(Map<String, Object> row : arr)
+			convertRow(row);
 		return arr.get(0);
 	}
 
@@ -343,6 +361,8 @@ public class DB {
 				+ arrayJoin(db.getBindValues().toArray()));
 		PaginateResult ret = new PaginateResult();
 		ret.data = database.queryForList(db.getSQL(), db.getBindValues().toArray());
+		for(Map<String, Object> row : ret.data)
+			convertRow(row);
 		ret.current_page = page;
 		ret.last_page = (totalRecord + pageSize - 1) / pageSize;
 		ret.per_page = pageSize;
@@ -392,6 +412,9 @@ public class DB {
 	public static List<Map<String, Object>> querySelect(String sql, Object... args) {
 		if(args == null)
 			args = new Object[] {};
-		return database.queryForList(sql, args);
+		List<Map<String, Object>> arr = database.queryForList(sql, args);
+		for(Map<String, Object> row : arr)
+			convertRow(row);
+		return arr;
 	}
 }

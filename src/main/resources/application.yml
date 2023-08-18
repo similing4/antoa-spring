@@ -1,34 +1,37 @@
 server:
-  port: 8080
+   port: 8080
 spring:
-  application:
-    name: maven-springboot
-  datasource:
-    url: jdbc:mysql://127.0.0.1/test?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
-    username: root
-    password: root
-    driver-class-name: com.mysql.cj.jdbc.Driver
+   application:
+      name: maven-springboot
+   datasource:
+      url: jdbc:mysql://192.168.2.112/test?useUnicode=true&characterEncoding=utf-8&useSSL=false&serverTimezone=Asia/Shanghai
+      username: test
+      password: test
+      driver-class-name: com.mysql.cj.jdbc.Driver
 antoa:
-  config:
-    home_page: 
-    login_diy: false
-    menu_routes:
-       - name: 首页
-         home: true
-       - name: 用户管理
-         role_limit_id: 1
-         children: 
-             - path: /admin/user/list
-               name: 用户列表
-               role_limit_id: 1
-             -
-               visible: false
-               path: /admin/user/edit
-               name: 用户编辑
-               role_limit_id: 1
-    qiniu:
-      access_key: QiniuAccessKey
-      secret_key: QiniuSecretKey
-      bucket: Bucket
-      url: http://xxx.xxx.com/
-    template_file_path: template
+   config:
+      home_page: null
+      login_diy: false
+      menu_routes: #菜单路由配置，path为完整URL链接，name为在菜单上显示的内容，breadcrumbname为面包屑上显示的标题，不设置默认为name
+      -  name: 首页 #页面名称，将显示在侧边栏及标签页上，如果不设置breadcrumbname也将设置为面包屑。
+         home: true #使用ant-design-vue-admin时此指定此页面组为首页/首页，设置的children将被无视，如需设置首页内容需要自定义vue项目的home.vue文件，只能设置在第一层且只能设置一个。
+      -  name: 用户管理
+         role_limit_id: 1 #权限限制，不设置为不限制
+         children:
+         -  path: /admin/user/list
+            name: 用户列表
+            role_limit_id: 1
+         -  visible: false #设置左侧导航栏中不显示该页面
+            path: /admin/user/create
+            name: 用户创建
+            role_limit_id: 1
+         -  visible: false
+            path: /admin/user/edit
+            name: 用户编辑
+            role_limit_id: 1
+      qiniu: #七牛云的配置，如果你使用了七牛云文件上传那么该项必填
+         access_key: QiniuAccessKey #七牛云的AccessKey，可以在用户头像下的秘钥管理处获取
+         secret_key: QiniuSecretKey #七牛云的SecretKey，同上
+         bucket: Bucket #Bucket名称，七牛云的对象存储-空间管理中的空间名称即为Bucket名称
+         url: http://xxx.xxx.com/ #访问域名，如https://qn.github.com/，注意要带末尾的斜杠。可以在七牛云的对象存空间管理中的域名中绑定，http或https由空间配置决定，请尽量不要用测试域名避免因过期而造成困扰。
+      template_file_path: template

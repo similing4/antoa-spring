@@ -56,18 +56,25 @@
 			<artifactId>jooq-codegen</artifactId>
 		</dependency>
 		<dependency>
-		    <groupId>com.qiniu</groupId>
-		    <artifactId>qiniu-java-sdk</artifactId>
-		    <version>[7.7.0, 7.7.99]</version>
+			<groupId>com.qiniu</groupId>
+			<artifactId>qiniu-java-sdk</artifactId>
+			<version>[7.7.0, 7.7.99]</version>
 		</dependency>
 		<dependency>
-		    <groupId>com.github.subchen</groupId>
-		    <artifactId>jetbrick-template</artifactId>
-		    <version>2.1.2</version>
+			<groupId>com.github.subchen</groupId>
+			<artifactId>jetbrick-template</artifactId>
+			<version>2.1.2</version>
 		</dependency>
 	</dependencies>
 	<build>
-		<!--打jar包插件-->
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<excludes>
+					<exclude>/Modules/**</exclude>
+				</excludes>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>

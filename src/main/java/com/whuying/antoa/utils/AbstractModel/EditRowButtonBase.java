@@ -42,7 +42,7 @@ public abstract class EditRowButtonBase implements Serializable {
      * @param UrlParamCalculator $calculator 传入的页面参数的实例
      * @return boolean 返回真则显示，否则不显示
      */
-    abstract public boolean judgeIsShow(UrlParamCalculator $calculator);
+    abstract public boolean judgeIsShow(UrlParamCalculator calculator);
 
 	@Override
     public String toString() {
