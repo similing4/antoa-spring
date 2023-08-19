@@ -10,7 +10,7 @@ ListFilter系列插件命名需要以PluginListFilter开头，否则不识别。
 ### 插件前端部分编写
 ListFilter系列插件开发需要在目录src/main/resources/Modules新建对应的目录作为插件目录，前端部分你需要在对应的插件目录中创建antoa_components/PluginListFilter文件夹，在里面编写ListFilter系列插件的前端页面。
 
-假设你的插件目录名称为AntOAPlugins，要创建的ListFilter系列插件为PluginListFilterTest，那么你需要在AntOAPlugins/antoa_components/PluginListFilter文件夹中创建PluginListFilterTest.vue文件并在内部编写代码。该文件是一个Vue的组件。下面以一个输入框搜索的插件编写方法举例：
+假设你的插件目录名称为AntOAPlugins，要创建的ListFilter系列插件为PluginListFilterTest，那么你需要在src/main/resources/Modules/AntOAPlugins/antoa_components/PluginListFilter文件夹中创建PluginListFilterTest.vue文件并在内部编写代码。该文件是一个Vue的组件。下面以一个输入框搜索的插件编写方法举例：
 ```
 <template>
 	<a-row class="antoa-list-filter-item">
@@ -67,45 +67,56 @@ export default {
 编写完成后你需要到AntOA/frontend文件夹中重新使用yarn build进行编译才能使用。如果你是前端想在开发过程中使用你可以直接把整个网站代码down下来然后在AntOA/frontend文件夹中使用yarn serve 进行调试~
 
 ### 插件后端部分编写
-ListFilter系列插件开发需要新建对应的插件目录开发，后端部分你可以在任意位置创建继承自Modules\AntOA\Http\Utils\AbstractModel\ListFilterBase类的子类并重写父类onFilter方法来实现后端功能。
+ListFilter系列插件开发需要新建对应的插件目录开发，后端部分你可以在任意位置创建继承自com.whuying.antoa.utils.AbstractModel.ListFilterBase类的子类并重写父类onFilter方法来实现后端功能。
 
-假设你的插件目录名称为AntOAPlugins，要创建的ListFilter系列插件为PluginListFilterTest，那么你可以在AntOAPlugins/Http/Requests中创建PluginListFilterTest类继承PluginListFilterBase。下面以一个输入框搜索的插件编写方法举例：
+假设你的插件目录名称为AntOAPlugins，要创建的ListFilter系列插件为PluginListFilterTest，那么你可以在任意位置创建PluginListFilterTest类继承PluginListFilterBase。下面以一个输入框搜索的插件编写方法举例：
 ```
-use Modules\AntOA\Http\Utils\AbstractModel\ListFilterBase;
-use Modules\AntOA\Http\Utils\DBListOperator;
-use Modules\AntOA\Http\Utils\Model\UrlParamCalculator;
+import com.whuying.antoa.utils.DBListOperator;
+import com.whuying.antoa.utils.AbstractModel.ListFilterBase;
+import com.whuying.antoa.utils.model.UrlParamCalculator;
+import com.whuying.antoa.utils.model.UrlParamCalculatorParamItem;
 
-class PluginListFilterTest extends ListFilterBase {
-    public function jsonSerialize() {
-        return array_merge(parent::jsonSerialize(), [
-            "type" => "PluginListFilterTest" //这里必须要与类名同名，否则前端会报错
-        ]);
-    }
-    public function onFilter(DBListOperator $gridListDbObject, UrlParamCalculator $urlParamCalculator, $uid){
+public class PluginListFilterTest extends ListFilterBase {
+
+	private static final long serialVersionUID = 8241260317925828593L;
+
+	public PluginListFilterTest(String col, String tip) {
+		super(col, tip);
+	}
+	
+	public PluginListFilterTest(String col, String tip, String defaultVal) {
+		super(col, tip, defaultVal);
+	}
+
+	public String type = "PluginListFilterTest";
+	
+	public void onFilter(DBListOperator gridListDbObject, UrlParamCalculator urlParamCalculator, String uid){
     	//这里用于实现后端逻辑
-        $param = $urlParamCalculator->getPageParamByKey($this->col);
-        if ($param !== null && $param->val != '')
-            $gridListDbObject->where($this->col, 'like', "%" . $param->val . "%");
+        UrlParamCalculatorParamItem param = urlParamCalculator.getPageParamByKey(this.col);
+        if (param != null && param.val != "")
+            gridListDbObject.where(this.col, "like", "%" + param.val + "%");
     }
 }
-
 ```
 这里解释一下后端逻辑处理方法：
-#### public function onFilter(DBListOperator $gridListDbObject, UrlParamCalculator $urlParamCalculator, $uid);
-前端发起筛选请求时供插件调用的方法。参数以外本实例自带的属性可以参考ListFilterBase类的定义，其中$this->col可以获取当前配置的字段是哪一个字段。
-##### 参数
-	- $gridListDbObject DBListOperator类型，GridList构造时传入的参数，你可以理解为数据库的Builder
-	- $urlParamCalculator UrlParamCalculator类型，你可以通过这个对象获取前端页面传来的任意参数
-	- $uid 当前登录的用户ID
+#### public void onFilter(DBListOperator gridListDbObject, UrlParamCalculator urlParamCalculator, String uid);
+前端发起筛选请求时供插件调用的方法。参数以外本实例自带的属性可以参考ListFilterBase类的定义，其中this.col可以获取当前配置的字段是哪一个字段。
+
+| 参数 | 参数类型 | 说明 |
+| ------ | ----- | ------ |
+| gridListDbObject | DBListOperator | DBListOperator类型，GridList构造时传入的参数，你可以理解为数据库的Builder |
+| urlParamCalculator | UrlParamCalculator | UrlParamCalculator类型，你可以通过这个对象获取前端页面传来的任意参数 |
+| uid | String | 当前登录的用户ID |
+
 ##### 返回值
 这个方法没有返回值，如果你不需要处理后端逻辑甚至可以不重写本方法。
 
 ### 使用
 使用GridList的filter方法传入你定义的ListFilterBase子类实例即可。例：
 ```
-$grid->list(new class(DB::table("user")) extends DBListOperator{})
-	->columnText("username", "用户名")
-	->filter(new PluginListFilterTest("username", "用户名"));
+grid.list(new DBListOperator(DB.table("user")) {})
+	.columnText("username", "用户名")
+	.filter(new PluginListFilterTest("username", "用户名"));
 ```
 
 ## ListTableColumn 系列插件
