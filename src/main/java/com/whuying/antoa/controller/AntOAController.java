@@ -407,7 +407,7 @@ public abstract class AntOAController {
 				throw new Exception("非法操作");
 			changeHookList = ((ListHeaderButtonWithForm)(buttonList.get(index))).gridCreateForm.getChangeHookList();
 		}
-		changeHookList = changeHookList.stream().filter(t -> col.equals(t.col)).collect(Collectors.toList());
+		changeHookList = changeHookList.stream().filter(t -> t.col.equals(col)).collect(Collectors.toList());
 		if (changeHookList.size() == 0)
 			throw new Exception("页面配置信息不存在");
 		CreateOrEditColumnChangeHookReturnData data = changeHookList.get(0).hook(content.getJSONObject("form"),
