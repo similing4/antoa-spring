@@ -20,7 +20,7 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 必填 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| Authorization | Token请求头 | string | Y | 通过登录授权接口获取 | 
+| Authorization | Token请求头 | String | Y | 通过登录授权接口获取 | 
 
 * GET参数:
 
@@ -195,10 +195,10 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| status | 响应码 | integer | 一定存在 | 值为1时请求成功，否则请求失败 | 
+| status | 响应码 | int | 一定存在 | 值为1时请求成功，否则请求失败 | 
 | grid | 配置路由的配置信息 | Grid | status为1时 | 详见Grid描述 |
-| api | 所有可用的API与页面 | object | status为1时 | 详见范例即可，除page结尾为页面外其余均为接口 |
-| msg | 请求失败原因 | string | status为0时 | - |
+| api | 所有可用的API与页面 | Object | status为1时 | 详见范例即可，除page结尾为页面外其余均为接口 |
+| msg | 请求失败原因 | String | status为0时 | - |
 
 * Grid
 
@@ -216,10 +216,10 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| primaryKey | 列表主键 | string | 一定存在 | 列表数据的主键，编辑功能开启时编辑按钮点击后跳转将携带该参数 | 
-| listFilterCollection | 筛选项 | array\<ListFilter\> | 一定存在 | 页面上方的筛选项 |
-| listHeaderButtonCollection | 顶部按钮项 | array\<HeaderButton\> | 一定存在 | 顶部按钮数组 |
-| listRowButtonCollection | 每行按钮项 | array\<RowButton\> | 一定存在 | 每行数据后方除编辑、删除按钮外的按钮数组 |
+| primaryKey | 列表主键 | String | 一定存在 | 列表数据的主键，编辑功能开启时编辑按钮点击后跳转将携带该参数 | 
+| listFilterCollection | 筛选项 | List\<ListFilter\> | 一定存在 | 页面上方的筛选项 |
+| listHeaderButtonCollection | 顶部按钮项 | List\<HeaderButton\> | 一定存在 | 顶部按钮数组 |
+| listRowButtonCollection | 每行按钮项 | List\<RowButton\> | 一定存在 | 每行数据后方除编辑、删除按钮外的按钮数组 |
 | hasCreate | 是否有创建 | boolean | 一定存在 | - |
 | hasDelete | 是否有删除 | boolean | 一定存在 | - |
 | hasEdit | 是否有编辑 | boolean | 一定存在 | - |
@@ -230,10 +230,10 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| primaryKey | 列表主键 | string | 一定存在 | 列表数据的主键 | 
-| createColumnCollection | 创建页表单项 | array\<CreateColumnBase\> | 一定存在 | - |
-| createRowButtonBaseCollection | 表单项后的按钮项 | array\<CreateRowButtonBase\> | 一定存在 | 详见CreateRowButtonBase说明 |
-| createOrEditColumnChangeHookCollection | 表单项变化监听事件 | array\<CreateOrEditColumnChangeHook\> | 一定存在 | 监听变化后调用接口 |
+| primaryKey | 列表主键 | String | 一定存在 | 列表数据的主键 | 
+| createColumnCollection | 创建页表单项 | List\<CreateColumnBase\> | 一定存在 | - |
+| createRowButtonBaseCollection | 表单项后的按钮项 | List\<CreateRowButtonBase\> | 一定存在 | 详见CreateRowButtonBase说明 |
+| createOrEditColumnChangeHookCollection | 表单项变化监听事件 | List\<CreateOrEditColumnChangeHook\> | 一定存在 | 监听变化后调用接口 |
 
 * GridEditForm
 
@@ -241,10 +241,10 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| primaryKey | 列表主键 | string | 一定存在 | 列表数据的主键，即传入编辑页的主键 | 
-| editColumnCollection | 编辑页表单项 | array\<EditColumnBase\> | 一定存在 | - |
-| editRowButtonBaseCollection | 表单项后的按钮项 | array\<EditRowButtonBase\> | 一定存在 | 详见EditRowButtonBase说明 |
-| createOrEditColumnChangeHookCollection | 表单项变化监听事件 | array\<CreateOrEditColumnChangeHook\> | 一定存在 | 监听变化后调用接口 |
+| primaryKey | 列表主键 | String | 一定存在 | 列表数据的主键，即传入编辑页的主键 | 
+| editColumnCollection | 编辑页表单项 | List\<EditColumnBase\> | 一定存在 | - |
+| editRowButtonBaseCollection | 表单项后的按钮项 | List\<EditRowButtonBase\> | 一定存在 | 详见EditRowButtonBase说明 |
+| createOrEditColumnChangeHookCollection | 表单项变化监听事件 | List\<CreateOrEditColumnChangeHook\> | 一定存在 | 监听变化后调用接口 |
 
 * ListFilter
 
@@ -252,10 +252,10 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| type | 类型 | string | 一定存在 | 筛选项的类型，一般为服务端ListFilterBase对应子类类名，用于前端页面的不同展现形式 |
-| col | 筛选的列 | string | 一定存在 | 筛选时传入键 |
-| tip | 筛选的列提示 | string | 一定存在 | 展示在列表页该筛选项上用于标识该筛选项是什么 |
-| default | 默认值 | string | 一定存在 | - |
+| type | 类型 | String | 一定存在 | 筛选项的类型，一般为服务端ListFilterBase对应子类类名，用于前端页面的不同展现形式 |
+| col | 筛选的列 | String | 一定存在 | 筛选时传入键 |
+| tip | 筛选的列提示 | String | 一定存在 | 展示在列表页该筛选项上用于标识该筛选项是什么 |
+| default | 默认值 | String | 一定存在 | - |
 | ... | 其它 | - | 根据后端实体类配置变化 | - |
 
 * HeaderButton
@@ -264,11 +264,11 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| type | 类型 | string | 一定存在 | 顶部按钮类型，一般为服务端ListHeaderButtonBase对应子类类名，用于前端页面的不同展现形式 |
-| buttonText | 按钮文本内容 | string | 一定存在 | - |
-| buttonType | 按钮类型 | string | 一定存在 | 详见AntDesign按钮的type属性 |
-| baseUrl | 基础Url | string | 一定存在 | 该字段无用，请使用finalUrl |
-| finalUrl | 最终请求地址 | string | 一定存在 | type不同作用不同，详见ListHeaderButtonBase对应子类描述 |
+| type | 类型 | String | 一定存在 | 顶部按钮类型，一般为服务端ListHeaderButtonBase对应子类类名，用于前端页面的不同展现形式 |
+| buttonText | 按钮文本内容 | String | 一定存在 | - |
+| buttonType | 按钮类型 | String | 一定存在 | 详见AntDesign按钮的type属性 |
+| baseUrl | 基础Url | String | 一定存在 | 该字段无用，请使用finalUrl |
+| finalUrl | 最终请求地址 | String | 一定存在 | type不同作用不同，详见ListHeaderButtonBase对应子类描述 |
 | ... | 其它 | - | 根据后端实体类配置变化 | - |
 
 * RowButton
@@ -277,11 +277,11 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| type | 类型 | string | 一定存在 | 顶部按钮类型，一般为服务端ListHeaderButtonBase对应子类类名，用于前端页面的不同展现形式 |
-| buttonText | 按钮文本内容 | string | 一定存在 | - |
-| buttonType | 按钮类型 | string | 一定存在 | 详见AntDesign按钮的type属性 |
-| baseUrl | 基础Url | string | 一定存在 | 该字段无用，请使用每行响应数据的BUTTON_FINAL_URL_DATA字段 |
-| finalUrl | 最终请求地址 | string | 一定存在 | 该字段无用，请使用每行响应数据的BUTTON_FINAL_URL_DATA字段 |
+| type | 类型 | String | 一定存在 | 顶部按钮类型，一般为服务端ListHeaderButtonBase对应子类类名，用于前端页面的不同展现形式 |
+| buttonText | 按钮文本内容 | String | 一定存在 | - |
+| buttonType | 按钮类型 | String | 一定存在 | 详见AntDesign按钮的type属性 |
+| baseUrl | 基础Url | String | 一定存在 | 该字段无用，请使用每行响应数据的BUTTON_FINAL_URL_DATA字段 |
+| finalUrl | 最终请求地址 | String | 一定存在 | 该字段无用，请使用每行响应数据的BUTTON_FINAL_URL_DATA字段 |
 | ... | 其它 | - | 根据后端实体类配置变化 | - |
 
 * CreateColumnBase
@@ -290,10 +290,10 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| type | 类型 | string | 一定存在 | 表单项的类型，一般为服务端CreateColumnBase对应子类类名，用于前端页面的不同展现形式 |
-| col | 字段 | string | 一定存在 | - |
-| tip | 字段提示 | string | 一定存在 | 展示在创建页该表单项左侧用于标识该项是什么 |
-| default | 默认值 | string | 一定存在 | - |
+| type | 类型 | String | 一定存在 | 表单项的类型，一般为服务端CreateColumnBase对应子类类名，用于前端页面的不同展现形式 |
+| col | 字段 | String | 一定存在 | - |
+| tip | 字段提示 | String | 一定存在 | 展示在创建页该表单项左侧用于标识该项是什么 |
+| default | 默认值 | String | 一定存在 | - |
 | ... | 其它 | - | 根据后端实体类配置变化 | - |
 
 * CreateRowButtonBase
@@ -302,11 +302,11 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| type | 类型 | string | 一定存在 | 按钮类型，一般为服务端CreateRowButtonBase对应子类类名，用于前端页面的不同展现形式 |
-| bindCol | 绑定的字段 | string | 一定存在 | 用于指定该按钮绑定在哪个表单项后 |
-| apiUrl | 最终请求地址 | string | 一定存在 | type不同作用不同，详见CreateRowButtonBase对应子类描述 |
-| buttonText | 按钮文本内容 | string | 一定存在 | - |
-| buttonType | 按钮类型 | string | 一定存在 | 详见AntDesign按钮的type属性 |
+| type | 类型 | String | 一定存在 | 按钮类型，一般为服务端CreateRowButtonBase对应子类类名，用于前端页面的不同展现形式 |
+| bindCol | 绑定的字段 | String | 一定存在 | 用于指定该按钮绑定在哪个表单项后 |
+| apiUrl | 最终请求地址 | String | 一定存在 | type不同作用不同，详见CreateRowButtonBase对应子类描述 |
+| buttonText | 按钮文本内容 | String | 一定存在 | - |
+| buttonType | 按钮类型 | String | 一定存在 | 详见AntDesign按钮的type属性 |
 | ... | 其它 | - | 根据后端实体类配置变化 | - |
 
 * EditColumnBase
@@ -315,10 +315,10 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| type | 类型 | string | 一定存在 | 表单项的类型，一般为服务端EditColumnBase对应子类类名，用于前端页面的不同展现形式 |
-| col | 字段 | string | 一定存在 | - |
-| tip | 字段提示 | string | 一定存在 | 展示在编辑页该表单项左侧用于标识该项是什么 |
-| default | 默认值 | string | 一定存在 | - |
+| type | 类型 | String | 一定存在 | 表单项的类型，一般为服务端EditColumnBase对应子类类名，用于前端页面的不同展现形式 |
+| col | 字段 | String | 一定存在 | - |
+| tip | 字段提示 | String | 一定存在 | 展示在编辑页该表单项左侧用于标识该项是什么 |
+| default | 默认值 | String | 一定存在 | - |
 | ... | 其它 | - | 根据后端实体类配置变化 | - |
 
 * EditRowButtonBase
@@ -327,11 +327,11 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| type | 类型 | string | 一定存在 | 按钮类型，一般为服务端EditRowButtonBase对应子类类名，用于前端页面的不同展现形式 |
-| bindCol | 绑定的字段 | string | 一定存在 | 用于指定该按钮绑定在哪个表单项后 |
-| apiUrl | 最终请求地址 | string | 一定存在 | type不同作用不同，详见EditRowButtonBase对应子类描述 |
-| buttonText | 按钮文本内容 | string | 一定存在 | - |
-| buttonType | 按钮类型 | string | 一定存在 | 详见AntDesign按钮的type属性 |
+| type | 类型 | String | 一定存在 | 按钮类型，一般为服务端EditRowButtonBase对应子类类名，用于前端页面的不同展现形式 |
+| bindCol | 绑定的字段 | String | 一定存在 | 用于指定该按钮绑定在哪个表单项后 |
+| apiUrl | 最终请求地址 | String | 一定存在 | type不同作用不同，详见EditRowButtonBase对应子类描述 |
+| buttonText | 按钮文本内容 | String | 一定存在 | - |
+| buttonType | 按钮类型 | String | 一定存在 | 详见AntDesign按钮的type属性 |
 | ... | 其它 | - | 根据后端实体类配置变化 | - |
 
 * CreateOrEditColumnChangeHook
@@ -340,7 +340,7 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| col | 绑定的字段 | string | 一定存在 | 用于指定哪个表单项产生变化后触发事件 |
+| col | 绑定的字段 | String | 一定存在 | 用于指定哪个表单项产生变化后触发事件 |
 
 
 > CURL请求示例

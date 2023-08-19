@@ -1,4 +1,4 @@
-默认情况下，后台首页定义于AntOA/frontend/src/pages/login/Login.vue中。如果您想自定义登录页，您可以在您的项目根目录建立AntOALogin.vue文件，详情请见AntOA/frontend/src/pages/login/Login.vue。
+默认情况下，后台首页定义于src/main/resources/Modules/AntOA/frontend/src/pages/login/Login.vue中。如果您想自定义登录页，您可以在您的项目根目录建立AntOALogin.vue文件，详情请见src/main/resources/Modules/AntOA/frontend/src/pages/login/Login.vue。
 
 # 登录流程
 
@@ -19,4 +19,4 @@ if(res.status == 1)
 ```
 
 # 组件库调用
-该页面可以使用ant-design相关的所有组件，可用库参考AntOA/frontend/package.json。如果你希望使用额外的js库，可以在对应的vue文件目录处填写自己需要的package.json并install，AntOA进行编译时会自动将其引入。
+该页面可以使用ant-design相关的所有组件，可用库参考src/main/resources/Modules/AntOA/frontend/package.json。如果你希望使用额外的js库，可以在对应的vue文件目录处填写自己需要的package.json并install，AntOA进行编译时会自动将其引入。

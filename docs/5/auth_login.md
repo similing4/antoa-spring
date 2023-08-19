@@ -27,8 +27,8 @@ POST JSON
 * POST参数（JSON）:
 | 字段名称 | 字段说明 | 类型 | 必填 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| username | 用户名 | string | Y | - | 
-| password | 密码 | string | Y | - |
+| username | 用户名 | String | Y | - | 
+| password | 密码 | String | Y | - |
 
 > 请求返回结果:
 
@@ -54,9 +54,9 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| status | 响应码 | integer | 一定存在 | 值为1时请求成功，否则请求失败 | 
-| data | 用户令牌 | string | status为1时 | - |
-| msg | 请求失败原因 | string | status为0时 | - |
+| status | 响应码 | int | 一定存在 | 值为1时请求成功，否则请求失败 | 
+| data | 用户令牌 | String | status为1时 | - |
+| msg | 请求失败原因 | String | status为0时 | - |
 
 > CURL请求示例
 

@@ -20,7 +20,7 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 必填 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| Authorization | Token请求头 | string | Y | 通过登录授权接口获取 | 
+| Authorization | Token请求头 | String | Y | 通过登录授权接口获取 | 
 
 * GET参数:
 
@@ -77,21 +77,21 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| status | 响应码 | integer | 一定存在 | 值为1时请求成功，否则请求失败 |
-| data | 每行数据 | object | status为1时 | 每行数据并附带BUTTON_CONDITION_DATA、BUTTON_FINAL_URL_DATA字段。详见表后说明 |
-| statistic | 配置的统计文本 | string | status为1时 | 由AntOAController子类实现的statistic方法决定 |
-| current_page | 当前页码 | integer | status为1时 | laravel框架自带pagination返回值，从1开始 |
-| path | 数据接口地址 | string | status为1时 | laravel框架自带pagination返回值 |
-| per_page | 每一页数据行数 | integer | status为1时 | laravel框架自带pagination返回值（框架中固定为15） |
-| total | 查询结果总数据行数 | integer | status为1时 | laravel框架自带pagination返回值 |
-| last_page | 最后一页数据是第几页 | integer | status为1时 | laravel框架自带pagination返回值 |
-| from | 当前页数据从第几行开始 | integer | status为1时 | laravel框架自带pagination返回值 |
-| to | 当前页数据到第几行结束 | integer | status为1时 | laravel框架自带pagination返回值 |
-| first_page_url | 第一页数据接口地址 | string | status为1时 | laravel框架自带pagination返回值 |
-| last_page_url | 最后一页数据接口地址 | string | status为1时 | laravel框架自带pagination返回值 |
-| prev_page_url | 上一页数据接口地址（没有上一页时为null） | string | status为1时 | laravel框架自带pagination返回值 |
-| next_page_url | 下一页数据接口地址（没有下一页时为null） | string | status为1时 | laravel框架自带pagination返回值 |
-| msg | 请求失败原因 | string | status为0时 | - |
+| status | 响应码 | int | 一定存在 | 值为1时请求成功，否则请求失败 |
+| data | 每行数据 | Object | status为1时 | 每行数据并附带BUTTON_CONDITION_DATA、BUTTON_FINAL_URL_DATA字段。详见表后说明 |
+| statistic | 配置的统计文本 | String | status为1时 | 由AntOAController子类实现的statistic方法决定 |
+| current_page | 当前页码 | int | status为1时 | laravel框架自带pagination返回值，从1开始 |
+| path | 数据接口地址 | String | status为1时 | laravel框架自带pagination返回值 |
+| per_page | 每一页数据行数 | int | status为1时 | laravel框架自带pagination返回值（框架中固定为15） |
+| total | 查询结果总数据行数 | int | status为1时 | laravel框架自带pagination返回值 |
+| last_page | 最后一页数据是第几页 | int | status为1时 | laravel框架自带pagination返回值 |
+| from | 当前页数据从第几行开始 | int | status为1时 | laravel框架自带pagination返回值 |
+| to | 当前页数据到第几行结束 | int | status为1时 | laravel框架自带pagination返回值 |
+| first_page_url | 第一页数据接口地址 | String | status为1时 | laravel框架自带pagination返回值 |
+| last_page_url | 最后一页数据接口地址 | String | status为1时 | laravel框架自带pagination返回值 |
+| prev_page_url | 上一页数据接口地址（没有上一页时为null） | String | status为1时 | laravel框架自带pagination返回值 |
+| next_page_url | 下一页数据接口地址（没有下一页时为null） | String | status为1时 | laravel框架自带pagination返回值 |
+| msg | 请求失败原因 | String | status为0时 | - |
 
 * BUTTON_CONDITION_DATA、BUTTON_FINAL_URL_DATA字段
 

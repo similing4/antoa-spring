@@ -20,7 +20,7 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 必填 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| Authorization | Token请求头 | string | Y | 通过登录授权接口获取 | 
+| Authorization | Token请求头 | String | Y | 通过登录授权接口获取 | 
 
 * GET参数:
 
@@ -57,10 +57,10 @@ POST JSON
 
 | 字段名称 | 字段说明 | 类型 | 存在条件 | 备注 |
 | ---- | ---- | ---- | ---- | ---- |
-| status | 响应码 | integer | 一定存在 | 值为1时请求成功，否则请求失败 | 
-| data | 用户UID | string | status为1时 | 表antoa_user的主键 |
-| role | 用户权限 | array\<string\> | status为1时 | 用户拥有的权限id数组 |
-| msg | 请求失败原因 | string | status为0时 | - |
+| status | 响应码 | int | 一定存在 | 值为1时请求成功，否则请求失败 | 
+| data | 用户UID | String | status为1时 | 表antoa_user的主键 |
+| role | 用户权限 | List\<String\> | status为1时 | 用户拥有的权限id数组 |
+| msg | 请求失败原因 | String | status为0时 | - |
 
 > CURL请求示例
 

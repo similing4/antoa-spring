@@ -1,6 +1,6 @@
-扩展页面与全局插件均可通过模块根目录的antoa_plugin.js文件配置。
+扩展页面与全局插件均可通过对应插件目录(src/main/resources/Modules/XXX/)的antoa_plugin.js文件配置。
 ## 文件组成
-假设你的模块名为AntOAPlugins，那么如果你想创建自定义插件，那么你需要创建AntOAPlugins/antoa_plugin.js文件。一个基本的antoa_plugin.js文件格式如下：
+假设你的模块名为AntOAPlugins，那么如果你想创建自定义插件，那么你需要创建src/main/resources/Modules/AntOAPlugins/antoa_plugin.js文件。一个基本的antoa_plugin.js文件格式如下：
 ```
 export default {
   install(Vue){
@@ -29,9 +29,9 @@ export default {
 这里的component字段就是你的页面了。name为标签页上显示的内容，path为你的页面访问地址。编写之后需要重新进入到AntOA/frontend文件夹使用yarn build编译。前端需要强制刷新才能看到效果。
 
 ## 自定义一整个页面
-如果你需要自定义整个页面（类似登录页这种页面），那么你需要将你自定义的页面放到base_routes数组中。定义方式同自定义后台子页面。编写之后同样需要重新进入到AntOA/frontend文件夹使用yarn build编译。前端需要强制刷新才能看到效果。
+如果你需要自定义整个页面（类似登录页这种页面），那么你需要将你自定义的页面放到base_routes数组中。定义方式同自定义后台子页面。编写之后同样需要重新进入到src/main/resources/Modules/AntOA/frontend文件夹使用yarn build编译。前端需要强制刷新才能看到效果。
 
-**注意！在定义页面结束后你需要在全局的antoa.php页面配置文件中配置menu_routes，避免你在访问页面时不能正确展开侧边栏~**
+**注意！在定义页面结束后你需要在全局的application.yml页面配置文件中配置menu_routes，避免你在访问页面时不能正确展开侧边栏~**
 
 ## 自定义全局插件
 如果你需要实现某些功能，比如把某些类实例挂载到Vue实例上，那么你可以在install方法中实现之。项目会直接调用Vue.use来加载你的插件。比如项目自带的API请求插件：
@@ -128,4 +128,4 @@ export default {
 	install
 };
 ```
-更多项目自带插件请查看AntOA/frontend/src/plugin文件夹下的各插件js文件。
+更多项目自带插件请查看src/main/resources/Modules/AntOA/frontend/src/plugin文件夹下的各插件js文件。
