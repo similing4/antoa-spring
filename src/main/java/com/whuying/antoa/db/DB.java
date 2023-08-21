@@ -22,6 +22,7 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 import org.jooq.Condition;
 import org.jooq.DeleteUsingStep;
+import org.jooq.Field;
 import org.jooq.InsertSetMoreStep;
 import org.jooq.InsertSetStep;
 
@@ -99,6 +100,7 @@ public class DB {
 		return where(key, "=", value);
 	}
 
+	@SuppressWarnings("unchecked")
 	public DB where(String key, String operator, Object value) {
 		if ("=".equals(operator))
 			steps.add(new Step("where", new Object[] { DSL.field(key).eq(value) }));
@@ -110,8 +112,12 @@ public class DB {
 			steps.add(new Step("where", new Object[] { DSL.field(key).ge(value) }));
 		else if ("<=".equals(operator))
 			steps.add(new Step("where", new Object[] { DSL.field(key).le(value) }));
-		else if ("like".equals(operator))
-			steps.add(new Step("where", new Object[] { DSL.field(key).like(value + "") }));
+		else if ("like".equals(operator)) {
+			if(value instanceof Field)
+				steps.add(new Step("where", new Object[] { DSL.field(key).like((Field<String>) value) }));
+			else
+				steps.add(new Step("where", new Object[] { DSL.field(key).like(value + "") }));
+		}
 		return this;
 	}
 

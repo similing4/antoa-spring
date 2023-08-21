@@ -1,5 +1,7 @@
 package com.whuying.antoa.utils.model;
 
+import org.jooq.impl.DSL;
+
 import com.alibaba.fastjson.JSONObject;
 import com.whuying.antoa.utils.DBListOperator;
 import com.whuying.antoa.utils.AbstractModel.ListFilterBase;
@@ -39,6 +41,6 @@ public class ListFilterText extends ListFilterBase {
 	public void onFilter(DBListOperator gridListDbObject, UrlParamCalculator urlParamCalculator, String uid) {
     	UrlParamCalculatorParamItem param = urlParamCalculator.getPageParamByKey(this.col);
         if (param != null && !"".equals(param.val + ""))
-            gridListDbObject.where(this.col, "like", "%" + param.val + "%");
+            gridListDbObject.where(this.col, "like", DSL.concat(DSL.inline("%"), DSL.value(param.val), DSL.inline("%")));
     }
 }
