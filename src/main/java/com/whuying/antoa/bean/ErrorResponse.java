@@ -12,6 +12,12 @@ public class ErrorResponse {
 		this.msg = msg;
 		this.data = data;
 	}
+	
+	public ErrorResponse(Exception e) {
+		this.status = 0;
+		this.msg = e.getMessage();
+		this.data = null;
+	}
 
 	@Override
 	public String toString() {

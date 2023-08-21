@@ -1,7 +1,5 @@
 package com.whuying.antoa.utils.model;
 
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -11,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.alibaba.fastjson.JSONObject;
 import com.whuying.antoa.bean.AntOAApiListResponse;
+import com.whuying.antoa.controller.AntOAController;
 import com.whuying.antoa.utils.DBListOperator;
 import com.whuying.antoa.utils.AbstractModel.CreateColumnBase;
 import com.whuying.antoa.utils.AbstractModel.ListFilterBase;
@@ -64,17 +63,6 @@ public abstract class ListHeaderButtonWithForm extends ListHeaderButtonBase {
         return true;
     }
 
-	public String readJSONFromRequest(HttpServletRequest request) throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "utf-8"));
-		StringBuffer sb = new StringBuffer("");
-		String temp;
-		while ((temp = br.readLine()) != null) {
-			sb.append(temp);
-		}
-		br.close();
-		return sb.toString();
-	}
-
     /**
      * @param HttpServletRequest request 请求数据
      * @param String uid 登录用户UID
@@ -83,7 +71,7 @@ public abstract class ListHeaderButtonWithForm extends ListHeaderButtonBase {
      */
     @Override
     public AntOAApiListResponse dealApiDetailColumnList(HttpServletRequest request, String uid) throws Exception{
-    	JSONObject req = JSONObject.parseObject(readJSONFromRequest(request));
+    	JSONObject req = (JSONObject) request.getAttribute(AntOAController.JSON_INPUT_KEY);
         String column = request.getParameter("col");
         String vModelVal = request.getParameter("val");
         for (CreateColumnBase columnItem1 : this.gridCreateForm.getCreateColumnList()) {
@@ -109,7 +97,7 @@ public abstract class ListHeaderButtonWithForm extends ListHeaderButtonBase {
                         continue;
                     columns.add(column1.col);
                 }
-                AntOAApiListResponse res = new AntOAApiListResponse(gridListDbObject.select(columns.toArray(new String[columns.size()])).paginate(8));
+                AntOAApiListResponse res = new AntOAApiListResponse(gridListDbObject.select(columns.toArray(new String[columns.size()])).paginate(8, Integer.parseInt(((req.get("page") == null) ? "1" : (req.get("page") + "")))));
                 for (Map<String, Object> searchResultItem : res.data) {
                 	List<Boolean> BUTTON_CONDITION_DATA = new ArrayList<>();
                 	List<String> BUTTON_FINAL_URL_DATA = new ArrayList<>();

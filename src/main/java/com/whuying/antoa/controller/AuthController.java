@@ -124,16 +124,16 @@ public class AuthController {
         if (item.children != null && item.children.size() != 0)
             for(MenuRouteTreeNode r : item.children)
             	ret.addAll(menuRouteTreeNodeDFS(r));
-        if (item.path == null || "".equals(item.path))
+        if ((item.path == null || "".equals(item.path)) && (item.children == null || item.children.size() == 0))
             return ret;
-        if (item.name == null || "".equals(item.name))
+        if (item.name == null || "".equals(item.name) && (item.children == null || item.children.size() == 0))
             return ret;
         ret.add(item);
     	return ret;
     }
 
     private List<MenuRouteTitleNode> makeTitleMap() throws Exception {
-    	List<MenuRouteTreeNode> configRoutes = routesConfigCollection.menu_routes;
+    	List<MenuRouteTreeNode> configRoutes = routesConfigCollection.clone().menu_routes;
     	if(configRoutes == null)
     		throw new Exception("Config antoa.menu_routes unset!");
         List<MenuRouteTreeNode> ret = new ArrayList<>();
@@ -153,7 +153,7 @@ public class AuthController {
     	Map<String, Object> user = DB.table("antoa_user").where("id", uid).first();
         if (user == null)
             throw new Exception("登录失效");
-        List<MenuRouteTreeNode> configRoutes = routesConfigCollection.menu_routes;
+        List<MenuRouteTreeNode> configRoutes = routesConfigCollection.clone().menu_routes;
     	if(configRoutes == null)
     		throw new Exception("Config antoa.menu_routes unset!");
         MenuRouteTreeNode nodeChangePasswordChild = new MenuRouteTreeNode();

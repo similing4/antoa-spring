@@ -346,9 +346,8 @@ public class DB {
 		return servletRequestAttributes.getRequest();
 	}
 
-	public PaginateResult paginate(int pageSize) {
+	public PaginateResult paginate(int pageSize, int page) {
 		long totalRecord = this.clone().count();
-		int page = 1;
 		String p = request().getParameter("page");
 		if (p != null)
 			try {
@@ -416,5 +415,12 @@ public class DB {
 		for(Map<String, Object> row : arr)
 			convertRow(row);
 		return arr;
+	}
+
+	public List<String> pluck(String column) {
+		this.setFields(column);
+		return this.get().stream().map(row -> {
+			return row.get(column) + "";
+		}).collect(Collectors.toList());
 	}
 }

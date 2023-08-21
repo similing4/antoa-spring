@@ -1,5 +1,6 @@
 package com.whuying.antoa.bean;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -17,4 +18,13 @@ public class MenuRouteTreeNodeCollection {
 	}
 
 	public List<MenuRouteTreeNode> menu_routes;
+	
+	public MenuRouteTreeNodeCollection clone() {
+		MenuRouteTreeNodeCollection ret = new MenuRouteTreeNodeCollection();
+		List<MenuRouteTreeNode> new_menu_routes = new ArrayList<>();
+		for(MenuRouteTreeNode item : menu_routes)
+			new_menu_routes.add(item.clone());
+		ret.setMenu_routes(new_menu_routes);
+		return ret;
+	}
 }

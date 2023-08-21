@@ -64,7 +64,7 @@ public abstract class ListRowButtonBase implements Serializable {
      * @param UrlParamCalculator $calculator 传入的页面参数的实例
      * @return List<UrlParamCalculatorParamItem> 并入到baseURL的URL参数
      */
-    abstract public List<UrlParamCalculatorParamItem> calcButtonParam(UrlParamCalculator $calculator);
+    abstract public List<UrlParamCalculatorParamItem> calcButtonParam(UrlParamCalculator calculator);
 
     /**
      * 根据页面参数计算当前按钮是否显示

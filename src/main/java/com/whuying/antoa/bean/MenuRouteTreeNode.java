@@ -23,16 +23,29 @@ public class MenuRouteTreeNode implements Serializable, ObjectDeserializer {
 	public List<MenuRouteTreeNode> children = new ArrayList<>();
 	private int role_limit_id = -1;
 	
+	public MenuRouteTreeNode clone() {
+		MenuRouteTreeNode ret = new MenuRouteTreeNode();
+		ret.setPath(getPath());
+		ret.setName(getName());
+		ret.setVisible(isVisible());
+		ret.setHome(isHome());
+		ret.setRole_limit(getRole_limit());
+		ret.setRole_limit_id(getRole_limit_id());
+		List<MenuRouteTreeNode> new_children = new ArrayList<>();
+		for(MenuRouteTreeNode item : getChildren())
+			new_children.add(item.clone());
+		ret.setChildren(new_children);
+		return ret;
+	}
+	
 	@Override
 	public String toString() {
 		JSONObject ret = new JSONObject();
 		ret.put("path", path);
 		ret.put("name", name);
 		ret.put("visible", visible);
-		if(home)
-			ret.put("isHome", home);
-		if(children.size() > 0)
-			ret.put("children", children);
+		ret.put("isHome", home);
+		ret.put("children", children);
 		return ret.toString();
 	}
 

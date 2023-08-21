@@ -52,8 +52,8 @@ public abstract class DBListOperator implements Cloneable {
     }
 
     //分页方法，不建议直接重写本方法，建议直接通过hook修改结果。
-    public PaginateResult paginate(int pageCount) {
-        return this.builder.paginate(pageCount);
+    public PaginateResult paginate(int pageCount, int currentPage) {
+        return this.builder.paginate(pageCount, currentPage);
     }
 
     //当编辑页或创建页使用column为COLUMN_CHILDREN_CHOOSE类型时，extra需要使用本方法。

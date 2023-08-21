@@ -37,6 +37,7 @@ import com.whuying.antoa.utils.model.*;
 import com.whuying.antoa.utils.hook.*;
 
 public abstract class AntOAController {
+	public static final String JSON_INPUT_KEY = "JSONINPUT";
 	protected Grid gridObj = null; // Grid对象
 	protected AuthService auth = null; // 如果你需要自己实现授权，你可以修改该类的实现。
 
@@ -69,23 +70,37 @@ public abstract class AntOAController {
 		e.printStackTrace();
 		return new ErrorResponse(0, e.getMessage(), null).toString();
 	}
+	
+	protected String getRequestBaseUrl() {
+		HttpServletRequest request = request();
+		String url = request.getScheme() + "://" + request.getServerName();
+		if(request.getScheme().toLowerCase().equals("https") && request.getServerPort() == 443)
+			return url;
+		if(request.getScheme().toLowerCase().equals("http") && request.getServerPort() == 80)
+			return url;
+		return url + ":" + request.getServerPort();
+	}
 
 	protected HttpServletRequest request() {
 		ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder
 				.getRequestAttributes();
 		Assert.notNull(servletRequestAttributes, "RequestAttributes不能为null");
-		return servletRequestAttributes.getRequest();
-	}
-
-	public String readJSONFromRequest(HttpServletRequest request) throws Exception {
-		BufferedReader br = new BufferedReader(new InputStreamReader(request.getInputStream(), "utf-8"));
-		StringBuffer sb = new StringBuffer("");
-		String temp;
-		while ((temp = br.readLine()) != null) {
-			sb.append(temp);
-		}
-		br.close();
-		return sb.toString();
+		HttpServletRequest ret = servletRequestAttributes.getRequest();
+		if(ret.getAttribute(JSON_INPUT_KEY) == null)
+			try {
+				BufferedReader br = new BufferedReader(new InputStreamReader(ret.getInputStream(), "utf-8"));
+				StringBuffer sb = new StringBuffer("");
+				String temp;
+				while ((temp = br.readLine()) != null) {
+					sb.append(temp);
+				}
+				br.close();
+				JSONObject req = JSONObject.parseObject(sb.toString());
+				ret.setAttribute(JSON_INPUT_KEY, req);
+			} catch(Exception e) {
+				ret.setAttribute(JSON_INPUT_KEY, new JSONObject());
+			}
+		return ret;
 	}
 
 	/**
@@ -154,7 +169,7 @@ public abstract class AntOAController {
 			throw new Exception("页面配置信息不存在");
 		DBListOperator gridListDbObject = this.gridObj.getGridList().getDBObject();
 		GridList gridList = this.gridObj.getGridList();
-		JSONObject req = JSONObject.parseObject(readJSONFromRequest(request()));
+		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		List<UrlParamCalculatorParamItem> pageParams = new ArrayList<>();
 		for (Entry<String, Object> key : req.entrySet())
 			pageParams.add(new UrlParamCalculatorParamItem(key.getKey(), key.getValue()));
@@ -166,7 +181,7 @@ public abstract class AntOAController {
 			if (!column.isTypeDisplay())
 				columns.add(column.col);
 		}
-		PaginateResult res = gridListDbObject.select(columns.toArray(new String[columns.size()])).paginate(15);
+		PaginateResult res = gridListDbObject.select(columns.toArray(new String[columns.size()])).paginate(15, Integer.parseInt(((req.get("page") == null) ? "1" : (req.get("page") + ""))));
 		for (Map<String, Object> searchResultItem : res.data) {
 			ArrayList<String> BUTTON_CONDITION_DATA = new ArrayList<String>();
 			ArrayList<String> BUTTON_FINAL_URL_DATA = new ArrayList<String>();
@@ -206,7 +221,7 @@ public abstract class AntOAController {
 		GridList gridList = this.gridObj.getGridList();
 		GridCreateForm gridCreate = this.gridObj.getCreateForm();
 		GridEditForm gridEdit = this.gridObj.getEditForm();
-		JSONObject req = JSONObject.parseObject(readJSONFromRequest(request()));
+		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		List<UrlParamCalculatorParamItem> pageParams = new ArrayList<UrlParamCalculatorParamItem>();
 		for (Entry<String, Object> key : req.entrySet())
 			pageParams.add(new UrlParamCalculatorParamItem(key.getKey(), key.getValue()));
@@ -240,7 +255,7 @@ public abstract class AntOAController {
 		String uid = this.getUserInfo();
 		if (this.gridObj.getCreateForm() == null)
 			throw new Exception("页面配置信息不存在");
-		JSONObject req = JSONObject.parseObject(readJSONFromRequest(request()));
+		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		GridCreateForm gridCreateForm = this.gridObj.getCreateForm();
 		Map<String, Object> param = new HashMap<>();
 		for (CreateColumnBase col : gridCreateForm.getCreateColumnList())
@@ -263,7 +278,7 @@ public abstract class AntOAController {
 		if (this.gridObj.getEditForm() == null)
 			throw new Exception("页面配置信息不存在");
 		String uid = this.getUserInfo();
-		JSONObject req = JSONObject.parseObject(readJSONFromRequest(request()));
+		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		GridEditForm gridEditForm = this.gridObj.getEditForm();
 		Map<String, Object> res = gridEditForm.getDBObject().find(req.getString(gridEditForm.primaryKey));
 		if (res == null)
@@ -286,7 +301,7 @@ public abstract class AntOAController {
 		if (this.gridObj.getEditForm() == null)
 			throw new Exception("页面配置信息不存在");
 		String uid = this.getUserInfo();
-		JSONObject req = JSONObject.parseObject(readJSONFromRequest(request()));
+		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		GridEditForm gridEditForm = this.gridObj.getEditForm();
 		Map<String, Object> param = new HashMap<>();
 		for (EditColumnBase col : gridEditForm.getEditColumnList())
@@ -307,9 +322,9 @@ public abstract class AntOAController {
 	public AntOAApiListResponse apiDetailColumnList() throws Exception {
 		init();
 		String uid = this.getUserInfo();
-		JSONObject req = JSONObject.parseObject(readJSONFromRequest(request()));
-		String type = req.getString("type");
-		String column = req.getString("col");
+		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
+		String type = request().getParameter("type");
+		String column = request().getParameter("col");
 		if (this.gridObj.getEditForm() == null && "edit".equals(type))
 			throw new Exception("页面配置信息不存在");
 		if (this.gridObj.getCreateForm() == null && "create".equals(type))
@@ -370,7 +385,7 @@ public abstract class AntOAController {
 	public AntOAApiColumnChangeResponse apiColumnChange() throws Exception {
 		init();
 		this.getUserInfo();
-		JSONObject content = JSONObject.parseObject(readJSONFromRequest(request()));
+		JSONObject content = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		if (content == null)
 			throw new Exception("非法操作");
 		List<CreateOrEditColumnChangeHook> changeHookList = new ArrayList<>();
