@@ -65,18 +65,18 @@ public abstract class AntOAController {
 	 * @return string 统计结果
 	 */
 	public abstract String statistic();
-	
+
 	protected String error(Exception e) {
 		e.printStackTrace();
 		return new ErrorResponse(0, e.getMessage(), null).toString();
 	}
-	
+
 	protected String getRequestBaseUrl() {
 		HttpServletRequest request = request();
 		String url = request.getScheme() + "://" + request.getServerName();
-		if(request.getScheme().toLowerCase().equals("https") && request.getServerPort() == 443)
+		if (request.getScheme().toLowerCase().equals("https") && request.getServerPort() == 443)
 			return url;
-		if(request.getScheme().toLowerCase().equals("http") && request.getServerPort() == 80)
+		if (request.getScheme().toLowerCase().equals("http") && request.getServerPort() == 80)
 			return url;
 		return url + ":" + request.getServerPort();
 	}
@@ -86,7 +86,7 @@ public abstract class AntOAController {
 				.getRequestAttributes();
 		Assert.notNull(servletRequestAttributes, "RequestAttributes不能为null");
 		HttpServletRequest ret = servletRequestAttributes.getRequest();
-		if(ret.getAttribute(JSON_INPUT_KEY) == null)
+		if (ret.getAttribute(JSON_INPUT_KEY) == null)
 			try {
 				BufferedReader br = new BufferedReader(new InputStreamReader(ret.getInputStream(), "utf-8"));
 				StringBuffer sb = new StringBuffer("");
@@ -97,18 +97,34 @@ public abstract class AntOAController {
 				br.close();
 				JSONObject req = JSONObject.parseObject(sb.toString());
 				ret.setAttribute(JSON_INPUT_KEY, req);
-			} catch(Exception e) {
+			} catch (Exception e) {
 				ret.setAttribute(JSON_INPUT_KEY, new JSONObject());
 			}
 		return ret;
+	}
+	
+	protected JSONObject input() {
+		return (JSONObject) request().getAttribute(JSON_INPUT_KEY);
+	}
+
+	protected <T> T input(String key, Class<T> type) {
+		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
+		if (req == null)
+			return null;
+		String[] keys = key.split(".");
+		if (keys.length > 1) {
+			for (int i = 0; i < keys.length - 1; i++)
+				req = req.getJSONObject(keys[i]);
+		}
+		return req.getObject(keys[keys.length - 1], type);
 	}
 
 	/**
 	 * 根据TOKEN获取UID，失败时抛出异常，只对API有效！
 	 * 
 	 * @return string UID
-	 * @throws HttpException 
-	 * @throws Exception token不合法时登录失效
+	 * @throws HttpException
+	 * @throws Exception     token不合法时登录失效
 	 */
 	protected String getUserInfo() throws HttpException {
 		String token = request().getHeader("Authorization");
@@ -120,7 +136,7 @@ public abstract class AntOAController {
 		Map<String, Object> user = DB.table("antoa_user").where("id", uid).first();
 		if (user == null)
 			throw new HttpException("登录失效", 403);
-		if ((int)(user.get("status")) == 0)
+		if ((int) (user.get("status")) == 0)
 			throw new HttpException("账户已被封禁", 403);
 		if (!this.checkPower(uid))
 			throw new HttpException("权限不足", 403);
@@ -181,7 +197,8 @@ public abstract class AntOAController {
 			if (!column.isTypeDisplay())
 				columns.add(column.col);
 		}
-		PaginateResult res = gridListDbObject.select(columns.toArray(new String[columns.size()])).paginate(15, Integer.parseInt(((req.get("page") == null) ? "1" : (req.get("page") + ""))));
+		PaginateResult res = gridListDbObject.select(columns.toArray(new String[columns.size()])).paginate(15,
+				Integer.parseInt(((req.get("page") == null) ? "1" : (req.get("page") + ""))));
 		for (Map<String, Object> searchResultItem : res.data) {
 			ArrayList<String> BUTTON_CONDITION_DATA = new ArrayList<String>();
 			ArrayList<String> BUTTON_FINAL_URL_DATA = new ArrayList<String>();
@@ -410,7 +427,7 @@ public abstract class AntOAController {
 			List<ListRowButtonBase> buttonList = this.gridObj.getGridList().getRowButtonList();// .getChangeHookList();
 			if (!(buttonList.get(index) instanceof ListRowButtonWithForm))
 				throw new Exception("非法操作");
-			changeHookList = ((ListRowButtonWithForm)(buttonList.get(index))).gridCreateForm.getChangeHookList();
+			changeHookList = ((ListRowButtonWithForm) (buttonList.get(index))).gridCreateForm.getChangeHookList();
 		} else if ("easy_header".equals(type)) {
 			if (!content.containsKey("index"))
 				throw new Exception("非法操作");
@@ -420,7 +437,7 @@ public abstract class AntOAController {
 			List<ListHeaderButtonBase> buttonList = this.gridObj.getGridList().getHeaderButtonList();// .getChangeHookList();
 			if (!(buttonList.get(index) instanceof ListHeaderButtonWithForm))
 				throw new Exception("非法操作");
-			changeHookList = ((ListHeaderButtonWithForm)(buttonList.get(index))).gridCreateForm.getChangeHookList();
+			changeHookList = ((ListHeaderButtonWithForm) (buttonList.get(index))).gridCreateForm.getChangeHookList();
 		}
 		changeHookList = changeHookList.stream().filter(t -> t.col.equals(col)).collect(Collectors.toList());
 		if (changeHookList.size() == 0)
@@ -433,7 +450,6 @@ public abstract class AntOAController {
 		ret.displayColumns = data.display;
 		return ret;
 	}
-
 
 	/**
 	 * /upload 接口
@@ -488,7 +504,7 @@ public abstract class AntOAController {
 		if (!isExtValid)
 			throw new Exception("未知或不支持的文件扩展名：" + extension);
 		String basePath = ResourceUtils.getURL("classpath:").getPath();
-		if(basePath == null || basePath.contains(".jar!"))
+		if (basePath == null || basePath.contains(".jar!"))
 			basePath = getBasePath();
 		File destDir = new File(basePath + "/public/antoa_uploads");
 		String destFile = uid + "_" + System.currentTimeMillis() + md5(filename) + "." + extension;
@@ -497,54 +513,53 @@ public abstract class AntOAController {
 		file.transferTo(new File(destDir, destFile));
 		return new NormalResponse(1, "/antoa_uploads/" + destFile, null);
 	}
-	
+
 	private String getBasePath() {
 		ApplicationHome home = new ApplicationHome(getClass());
 		File jarFile = home.getSource();
 		return jarFile.getParentFile().getPath();
 	}
-	
-    private boolean checkRowButtonHasUploadButton(List<ListRowButtonBase> buttonList, String type) {
-        if ("header".equals(type)) {
-            for(ListRowButtonBase headerButton : buttonList)
-                if (headerButton.isColumnNeedApiUpload())
-                    return true;
-        } else if ("row".equals(type)) {
-            for(ListRowButtonBase rowButton : buttonList)
-                if (rowButton.isColumnNeedApiUpload())
-                    return true;
-        }
-        return false;
+
+	private boolean checkRowButtonHasUploadButton(List<ListRowButtonBase> buttonList, String type) {
+		if ("header".equals(type)) {
+			for (ListRowButtonBase headerButton : buttonList)
+				if (headerButton.isColumnNeedApiUpload())
+					return true;
+		} else if ("row".equals(type)) {
+			for (ListRowButtonBase rowButton : buttonList)
+				if (rowButton.isColumnNeedApiUpload())
+					return true;
+		}
+		return false;
 	}
 
 	/**
-     * 判断按钮列表中是否包含上传按钮
-     * @param buttonList
-     * @param type 类型，header与row
-     * @return boolean
-     */
-    private boolean checkHeaderButtonHasUploadButton(List<ListHeaderButtonBase> buttonList, String type) {
-        if ("header".equals(type)) {
-            for(ListHeaderButtonBase headerButton : buttonList)
-                if (headerButton.isColumnNeedApiUpload())
-                    return true;
-        } else if ("row".equals(type)) {
-            for(ListHeaderButtonBase rowButton : buttonList)
-                if (rowButton.isColumnNeedApiUpload())
-                    return true;
-        }
-        return false;
-    }
+	 * 判断按钮列表中是否包含上传按钮
+	 * 
+	 * @param buttonList
+	 * @param type       类型，header与row
+	 * @return boolean
+	 */
+	private boolean checkHeaderButtonHasUploadButton(List<ListHeaderButtonBase> buttonList, String type) {
+		if ("header".equals(type)) {
+			for (ListHeaderButtonBase headerButton : buttonList)
+				if (headerButton.isColumnNeedApiUpload())
+					return true;
+		} else if ("row".equals(type)) {
+			for (ListHeaderButtonBase rowButton : buttonList)
+				if (rowButton.isColumnNeedApiUpload())
+					return true;
+		}
+		return false;
+	}
 
-    /**
-     * 根据UID对控制器下所有接口进行鉴权
-     * @param uid 用户UID
-     * @return boolean 返回真则验权通过，否则验权失败
-     */
-    protected abstract boolean checkPower(String uid);
-    
-    
-
+	/**
+	 * 根据UID对控制器下所有接口进行鉴权
+	 * 
+	 * @param uid 用户UID
+	 * @return boolean 返回真则验权通过，否则验权失败
+	 */
+	protected abstract boolean checkPower(String uid);
 
 	@RequestMapping(value = { "/list" }, method = RequestMethod.POST)
 	public String apiListResponse() throws Exception {
