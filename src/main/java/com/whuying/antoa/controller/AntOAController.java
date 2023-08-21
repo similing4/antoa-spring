@@ -38,14 +38,13 @@ import com.whuying.antoa.utils.hook.*;
 
 public abstract class AntOAController {
 	public static final String JSON_INPUT_KEY = "JSONINPUT";
-	protected Grid gridObj = null; // Grid对象
-	protected AuthService auth = null; // 如果你需要自己实现授权，你可以修改该类的实现。
+	protected AuthService auth = new AuthService(); // 如果你需要自己实现授权，你可以修改该类的实现。
 
-	public void init() throws HttpException {
-		this.auth = new AuthService();
-		this.gridObj = new Grid();
+	public Grid init() throws HttpException {
+		Grid grid = new Grid();
 		this.getUserInfo();
-		this.grid(this.gridObj);
+		this.grid(grid);
+		return grid;
 	}
 
 	private String md5(String text) {
@@ -106,12 +105,16 @@ public abstract class AntOAController {
 	protected JSONObject input() {
 		return (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 	}
+	
+	protected String input(String key) {
+		return input(key, Object.class) + "";
+	}
 
 	protected <T> T input(String key, Class<T> type) {
 		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		if (req == null)
 			return null;
-		String[] keys = key.split(".");
+		String[] keys = key.split("\\.");
 		if (keys.length > 1) {
 			for (int i = 0; i < keys.length - 1; i++)
 				req = req.getJSONObject(keys[i]);
@@ -149,14 +152,14 @@ public abstract class AntOAController {
 	 * @param Request request
 	 * @return array 参数数组
 	 */
-	protected CustomParamResponse getCustomParam() {
+	protected CustomParamResponse getCustomParam(Grid grid) {
 		String path = request().getRequestURI();
 		int apiPos = path.indexOf("api/");
 		if (apiPos != -1)
 			path = path.substring(apiPos + 4);
 		path = path.substring(0, path.lastIndexOf("/"));
 		CustomParamResponse ret = new CustomParamResponse();
-		ret.grid = this.gridObj;
+		ret.grid = grid;
 		ret.api = new CustomParamResponse.Api();
 		ret.api.path = request().getRequestURI();
 		ret.api.list = "/api/" + path + "/list";
@@ -179,12 +182,12 @@ public abstract class AntOAController {
 	 * @return AntOAApiListResponse 列表页接口JSON
 	 */
 	public AntOAApiListResponse apiList() throws Exception {
-		init();
+		Grid grid = init();
 		String uid = this.getUserInfo();
-		if (this.gridObj.getGridList() == null)
+		if (grid.getGridList() == null)
 			throw new Exception("页面配置信息不存在");
-		DBListOperator gridListDbObject = this.gridObj.getGridList().getDBObject();
-		GridList gridList = this.gridObj.getGridList();
+		DBListOperator gridListDbObject = grid.getGridList().getDBObject();
+		GridList gridList = grid.getGridList();
 		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		List<UrlParamCalculatorParamItem> pageParams = new ArrayList<>();
 		for (Entry<String, Object> key : req.entrySet())
@@ -221,7 +224,7 @@ public abstract class AntOAController {
 		AntOAApiListResponse resp = new AntOAApiListResponse(res);
 		resp.status = 1;
 		resp.statistic = this.statistic();
-		ListHook hook = this.gridObj.getListHook();
+		ListHook hook = grid.getListHook();
 		if (hook != null)
 			return hook.hook(resp);
 		return resp;
@@ -233,11 +236,11 @@ public abstract class AntOAController {
 	 * @return String 页面配置信息JSON
 	 */
 	public AntOAApiGridConfigResponse apiGridConfig() throws Exception {
-		init();
+		Grid grid = init();
 		this.getUserInfo();
-		GridList gridList = this.gridObj.getGridList();
-		GridCreateForm gridCreate = this.gridObj.getCreateForm();
-		GridEditForm gridEdit = this.gridObj.getEditForm();
+		GridList gridList = grid.getGridList();
+		GridCreateForm gridCreate = grid.getCreateForm();
+		GridEditForm gridEdit = grid.getEditForm();
 		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		List<UrlParamCalculatorParamItem> pageParams = new ArrayList<UrlParamCalculatorParamItem>();
 		for (Entry<String, Object> key : req.entrySet())
@@ -258,7 +261,7 @@ public abstract class AntOAController {
 		resp.grid.list = gridList;
 		resp.grid.create = gridCreate;
 		resp.grid.edit = gridEdit;
-		resp.api = this.getCustomParam().api;
+		resp.api = this.getCustomParam(grid).api;
 		return resp;
 	}
 
@@ -268,16 +271,16 @@ public abstract class AntOAController {
 	 * @return NormalResponse 通用成功失败返回
 	 */
 	public NormalResponse apiCreate() throws Exception {
-		init();
+		Grid grid = init();
 		String uid = this.getUserInfo();
-		if (this.gridObj.getCreateForm() == null)
+		if (grid.getCreateForm() == null)
 			throw new Exception("页面配置信息不存在");
 		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
-		GridCreateForm gridCreateForm = this.gridObj.getCreateForm();
+		GridCreateForm gridCreateForm = grid.getCreateForm();
 		Map<String, Object> param = new HashMap<>();
 		for (CreateColumnBase col : gridCreateForm.getCreateColumnList())
 			param.put(col.col, col.onGuestVal(req, uid));
-		CreateHook hook = this.gridObj.getCreateHook();
+		CreateHook hook = grid.getCreateHook();
 		if (hook != null)
 			param = hook.hook(param);
 		if (param != null)
@@ -291,18 +294,18 @@ public abstract class AntOAController {
 	 * @return AntOAApiDetailResponse 详情数据
 	 */
 	public AntOAApiDetailResponse apiDetail() throws Exception {
-		init();
-		if (this.gridObj.getEditForm() == null)
+		Grid grid = init();
+		if (grid.getEditForm() == null)
 			throw new Exception("页面配置信息不存在");
 		String uid = this.getUserInfo();
 		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
-		GridEditForm gridEditForm = this.gridObj.getEditForm();
+		GridEditForm gridEditForm = grid.getEditForm();
 		Map<String, Object> res = gridEditForm.getDBObject().find(req.getString(gridEditForm.primaryKey));
 		if (res == null)
 			throw new Exception("该项目不存在");
 		for (EditColumnBase col : gridEditForm.getEditColumnList())
 			res.put(col.col, col.onServerVal(new JSONObject(res), uid));
-		DetailHook hook = this.gridObj.getDetailHook();
+		DetailHook hook = grid.getDetailHook();
 		if (hook != null)
 			return hook.hook(new AntOAApiDetailResponse(1, res));
 		return new AntOAApiDetailResponse(1, res);
@@ -314,16 +317,16 @@ public abstract class AntOAController {
 	 * @return NormalResponse 通用成功失败返回
 	 */
 	public NormalResponse apiSave() throws Exception {
-		init();
-		if (this.gridObj.getEditForm() == null)
+		Grid grid = init();
+		if (grid.getEditForm() == null)
 			throw new Exception("页面配置信息不存在");
 		String uid = this.getUserInfo();
 		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
-		GridEditForm gridEditForm = this.gridObj.getEditForm();
+		GridEditForm gridEditForm = grid.getEditForm();
 		Map<String, Object> param = new HashMap<>();
 		for (EditColumnBase col : gridEditForm.getEditColumnList())
 			param.put(col.col, col.onGuestVal(req, uid));
-		SaveHook hook = this.gridObj.getSaveHook();
+		SaveHook hook = grid.getSaveHook();
 		if (hook != null)
 			param = hook.hook(param);
 		if (param != null)
@@ -337,28 +340,28 @@ public abstract class AntOAController {
 	 * @return String 通用成功失败返回
 	 */
 	public AntOAApiListResponse apiDetailColumnList() throws Exception {
-		init();
+		Grid grid = init();
 		String uid = this.getUserInfo();
 		JSONObject req = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		String type = request().getParameter("type");
 		String column = request().getParameter("col");
-		if (this.gridObj.getEditForm() == null && "edit".equals(type))
+		if (grid.getEditForm() == null && "edit".equals(type))
 			throw new Exception("页面配置信息不存在");
-		if (this.gridObj.getCreateForm() == null && "create".equals(type))
+		if (grid.getCreateForm() == null && "create".equals(type))
 			throw new Exception("页面配置信息不存在");
 		if ("create".equals(type)) {
-			for (CreateColumnBase columnItem : this.gridObj.getCreateForm().getCreateColumnList()) {
+			for (CreateColumnBase columnItem : grid.getCreateForm().getCreateColumnList()) {
 				if (columnItem.isColumnNeedDealApiDetailColumnList() && column.equals(columnItem.col))
 					return columnItem.dealApiDetailColumnList(request(), uid);
 			}
 		} else if ("edit".equals(type)) {
-			for (EditColumnBase columnItem : this.gridObj.getEditForm().getEditColumnList()) {
+			for (EditColumnBase columnItem : grid.getEditForm().getEditColumnList()) {
 				if (columnItem.isColumnNeedDealApiDetailColumnList() && column.equals(columnItem.col))
 					return columnItem.dealApiDetailColumnList(request(), uid);
 			}
 		} else if ("easy_row".equals(type)) {
 			int index = Integer.parseInt(req.getString("index"));
-			List<ListRowButtonBase> buttonList = this.gridObj.getGridList().getRowButtonList();
+			List<ListRowButtonBase> buttonList = grid.getGridList().getRowButtonList();
 			if (!buttonList.get(index).isColumnNeedDealApiDetailColumnList())
 				throw new Exception("该数据不存在，请检查RowButton相关配置！");
 			return buttonList.get(index).dealApiDetailColumnList(request(), uid);
@@ -372,20 +375,20 @@ public abstract class AntOAController {
 	 * @return String 通用成功失败返回
 	 */
 	public NormalResponse apiDelete() throws Exception {
-		init();
-		if (this.gridObj.getGridList() == null)
+		Grid grid = init();
+		if (grid.getGridList() == null)
 			throw new Exception("页面配置信息不存在");
-		if (!this.gridObj.getGridList().hasDelete)
+		if (!grid.getGridList().hasDelete)
 			throw new Exception("非法操作");
 		this.getUserInfo();
-		DBListOperator obj = this.gridObj.getGridList().getDBObject();
+		DBListOperator obj = grid.getGridList().getDBObject();
 		String id = request().getParameter("id");
 		if (id == null)
 			throw new Exception("缺少参数ID");
 		Map<String, Object> resp = obj.find(Integer.parseInt(id));
 		if (resp == null)
 			throw new Exception("项目不存在");
-		DeleteHook hook = this.gridObj.getDeleteHook();
+		DeleteHook hook = grid.getDeleteHook();
 		if (hook != null)
 			id = hook.hook(id);
 		if (id != null)
@@ -400,7 +403,7 @@ public abstract class AntOAController {
 	 * @return AntOAApiColumnChangeResponse 详见CreateOrEditColumnChangeHook
 	 */
 	public AntOAApiColumnChangeResponse apiColumnChange() throws Exception {
-		init();
+		Grid grid = init();
 		this.getUserInfo();
 		JSONObject content = (JSONObject) request().getAttribute(JSON_INPUT_KEY);
 		if (content == null)
@@ -411,20 +414,20 @@ public abstract class AntOAController {
 		String type = content.getString("type");
 		String col = content.getString("col");
 		if ("create".equals(type)) {
-			if (this.gridObj.getCreateForm() == null)
+			if (grid.getCreateForm() == null)
 				throw new Exception("页面配置信息不存在");
-			changeHookList = this.gridObj.getCreateForm().getChangeHookList();
+			changeHookList = grid.getCreateForm().getChangeHookList();
 		} else if ("edit".equals(type)) {
-			if (this.gridObj.getEditForm() == null)
+			if (grid.getEditForm() == null)
 				throw new Exception("页面配置信息不存在");
-			changeHookList = this.gridObj.getEditForm().getChangeHookList();
+			changeHookList = grid.getEditForm().getChangeHookList();
 		} else if ("easy_row".equals(type)) {
 			if (!content.containsKey("index"))
 				throw new Exception("非法操作");
 			int index = Integer.parseInt(content.getString("index"));
-			if (this.gridObj.getGridList() == null)
+			if (grid.getGridList() == null)
 				throw new Exception("页面配置信息不存在");
-			List<ListRowButtonBase> buttonList = this.gridObj.getGridList().getRowButtonList();// .getChangeHookList();
+			List<ListRowButtonBase> buttonList = grid.getGridList().getRowButtonList();// .getChangeHookList();
 			if (!(buttonList.get(index) instanceof ListRowButtonWithForm))
 				throw new Exception("非法操作");
 			changeHookList = ((ListRowButtonWithForm) (buttonList.get(index))).gridCreateForm.getChangeHookList();
@@ -432,9 +435,9 @@ public abstract class AntOAController {
 			if (!content.containsKey("index"))
 				throw new Exception("非法操作");
 			int index = Integer.parseInt(content.getString("index"));
-			if (this.gridObj.getGridList() == null)
+			if (grid.getGridList() == null)
 				throw new Exception("页面配置信息不存在");
-			List<ListHeaderButtonBase> buttonList = this.gridObj.getGridList().getHeaderButtonList();// .getChangeHookList();
+			List<ListHeaderButtonBase> buttonList = grid.getGridList().getHeaderButtonList();// .getChangeHookList();
 			if (!(buttonList.get(index) instanceof ListHeaderButtonWithForm))
 				throw new Exception("非法操作");
 			changeHookList = ((ListHeaderButtonWithForm) (buttonList.get(index))).gridCreateForm.getChangeHookList();
@@ -458,12 +461,12 @@ public abstract class AntOAController {
 	 * @return AntOAApiColumnChangeResponse 详见CreateOrEditColumnChangeHook
 	 */
 	public NormalResponse uploadFile(MultipartFile file, String type, String col) throws Exception {
-		init();
+		Grid grid = init();
 		String uid = this.getUserInfo();
 		String _type = type;
 		String _col = col;
 		if ("create".equals(_type)) {
-			GridCreateForm gridCreateForm = this.gridObj.getCreateForm();
+			GridCreateForm gridCreateForm = grid.getCreateForm();
 			if (gridCreateForm == null)
 				throw new Exception("非法请求");
 			CreateColumnBase column = null;
@@ -473,7 +476,7 @@ public abstract class AntOAController {
 			if (column == null)
 				throw new Exception("非法请求");
 		} else if ("edit".equals(_type)) {
-			GridEditForm gridEditForm = this.gridObj.getEditForm();
+			GridEditForm gridEditForm = grid.getEditForm();
 			if (gridEditForm == null)
 				throw new Exception("非法请求");
 			EditColumnBase column = null;
@@ -483,11 +486,11 @@ public abstract class AntOAController {
 			if (column == null)
 				throw new Exception("非法请求");
 		} else if ("easy_header".equals(_type)) {
-			List<ListHeaderButtonBase> headerList = this.gridObj.getGridList().getHeaderButtonList();
+			List<ListHeaderButtonBase> headerList = grid.getGridList().getHeaderButtonList();
 			if (!this.checkHeaderButtonHasUploadButton(headerList, "header"))
 				throw new Exception("非法请求");
 		} else if ("easy_row".equals(_type)) {
-			List<ListRowButtonBase> headerList = this.gridObj.getGridList().getRowButtonList();
+			List<ListRowButtonBase> headerList = grid.getGridList().getRowButtonList();
 			if (!this.checkRowButtonHasUploadButton(headerList, "row"))
 				throw new Exception("非法请求");
 		} else
