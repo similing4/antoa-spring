@@ -25,14 +25,10 @@ import com.whuying.antoa.utils.Utils;
 @RestController
 public class AuthController {
     
-    protected AuthService auth = null;
+    protected AuthService auth = new AuthService();
     
     @Autowired
     private MenuRouteTreeNodeCollection routesConfigCollection;
-
-    public AuthController() {
-        this.auth = new AuthService();
-    }
 
     /**
      * 登录授权

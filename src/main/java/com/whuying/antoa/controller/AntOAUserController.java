@@ -24,7 +24,7 @@ public class AntOAUserController {
     /**
      * AuthService对象，如果你需要自己实现授权Token，你可以重写之
      */
-    protected AuthService auth = null;
+    protected AuthService auth = new AuthService();
 
     protected HttpServletRequest request() {
         ServletRequestAttributes servletRequestAttributes = (ServletRequestAttributes) RequestContextHolder
@@ -43,10 +43,6 @@ public class AntOAUserController {
 		br.close();
 		return sb.toString();
 	}
-
-    public AntOAUserController() {
-        this.auth = new AuthService();
-    }
     
     /**
      * 根据TOKEN获取UID，失败时抛出异常，只对API有效！
