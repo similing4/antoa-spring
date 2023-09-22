@@ -22,7 +22,7 @@ Java1.8 + eclipse(Maven)
 java -cp public -jar xxx.jar
 ```
 
-前端代码请查看本项目前端部分（如果没有特殊需求不需要修改前端代码）：[AntOA Frontend](https://github.com/similing4/antoa-spring/main/src/main/resources/Modules/AntOA/frontend)
+前端代码请查看本项目前端部分（如果没有特殊需求不需要修改前端代码）：[AntOA Frontend](https://github.com/similing4/antoa-spring/tree/main/src/main/resources/Modules/AntOA/frontend)
 
 ## 初始配置及修改配置
 ### application.yml
